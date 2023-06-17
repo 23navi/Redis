@@ -23,8 +23,8 @@ const client = createClient({
 	socket: {
 		host: process.env.REDIS_HOST,
 		port: parseInt(process.env.REDIS_PORT)
-	},
-	password: process.env.REDIS_PW
+	}
+	// password: process.env.REDIS_PW
 });
 
 const serializeHistory = (amount, createdAt) => {
