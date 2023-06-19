@@ -11,6 +11,7 @@ export const useCachePage: Handle = async ({ event, resolve }) => {
 
 	const page = await getCachedPage(event.url.pathname);
 
+	// If cache found, return it
 	if (page) {
 		return new Response(page, {
 			headers: {
@@ -18,7 +19,8 @@ export const useCachePage: Handle = async ({ event, resolve }) => {
 			}
 		});
 	}
-
+	// else re-render the page and return it and also add it to cache
+	
 	event.request.headers.set('if-none-match', Math.random().toString());
 	const res = await resolve(event);
 
