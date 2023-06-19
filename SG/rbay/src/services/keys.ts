@@ -9,3 +9,7 @@ export const usersKey = (id: string) => {
 export const sessionsKey = (sessionId: string) => {
 	return `sessions#${sessionId}`;
 };
+
+export const itemsKey = (itemId: string) => {
+	return `items#${itemId}`;
+};
