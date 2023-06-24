@@ -19,6 +19,7 @@ export const getItems = async (ids: string[]) => {
 	const getCommands = ids.map((id) => {
 		return client.hGetAll(itemsKey(id));
 	});
+	
 
 	const pipelineResults = await Promise.all(getCommands);
 

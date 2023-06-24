@@ -18,3 +18,7 @@ export const usernamesSetUniqueKey = () => {
 	// This is the name of the set
 	return `usernames:unique`;
 };
+
+export const userLikesKey = (userId) => {
+	return `userlikes#${userId}`;
+};
