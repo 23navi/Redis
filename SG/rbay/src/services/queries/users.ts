@@ -1,9 +1,18 @@
 import type { CreateUserAttrs } from '$services/types';
 import { genId } from '$services/utils';
-import { usersKey, usernamesSetUniqueKey } from '$services/keys';
+import { usersKey, usernamesSetUniqueKey, usernamesKey } from '$services/keys';
 import { client } from '$services/redis';
 
-export const getUserByUsername = async (username: string) => {};
+export const getUserByUsername = async (username: string) => {
+	const decimalUserId = await client.zScore(usernamesKey(), username);
+	if (decimalUserId === null) {
+		throw new Error('User not found');
+	}
+	const userId = decimalUserId.toString(16);
+	const user = await client.hGetAll(usersKey(userId));
+
+	return userDeserializer(userId, user);
+};
 
 export const getUserById = async (id: string) => {
 	const user = await client.hGetAll(usersKey(id));
@@ -22,10 +31,14 @@ export const createUser = async (attrs: CreateUserAttrs) => {
 	}
 
 	const userId = genId();
-	client.hSet(usersKey(userId), userSerializer(attrs));
+	await client.hSet(usersKey(userId), userSerializer(attrs));
 	// Add username to set
-	client.sAdd(usernamesSetUniqueKey(), attrs.username);
+	await client.sAdd(usernamesSetUniqueKey(), attrs.username);
 
+	await client.zAdd(usernamesKey(), {
+		value: attrs.username,
+		score: parseInt(userId, 16)
+	});
 	return userId;
 };
 

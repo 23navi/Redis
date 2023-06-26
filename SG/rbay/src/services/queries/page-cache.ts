@@ -1,7 +1,7 @@
 import { client } from '$services/redis';
 import { pageCacheKey } from '$services/keys';
 
-const cacheableRoutes = ['/about', '/privacy', '/auth/signin', '/auth/signup'];
+const cacheableRoutes = ['/about', '/privacy'];
 
 export const getCachedPage = (route: string) => {
 	if (cacheableRoutes.includes(route)) {
