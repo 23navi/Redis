@@ -33,3 +33,8 @@ export const usernamesSetUniqueKey = () => {
 export const userLikesKey = (userId) => {
 	return `userlikes#${userId}`;
 };
+
+//sortedset
+export const itemsByViewsKey = () => {
+	return 'items:views';
+};
