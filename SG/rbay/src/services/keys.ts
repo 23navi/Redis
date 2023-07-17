@@ -38,3 +38,8 @@ export const userLikesKey = (userId) => {
 export const itemsByViewsKey = () => {
 	return 'items:views';
 };
+
+//sortedset
+export const itemsByEndingAtKey = () => {
+	return 'items:endingat';
+};
