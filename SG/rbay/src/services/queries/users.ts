@@ -3,12 +3,17 @@ import { genId } from '$services/utils';
 import { usersKey, usernamesSetUniqueKey, usernamesKey } from '$services/keys';
 import { client } from '$services/redis';
 
+
+// Why are we using sorted set? Bec we have to do find user by username and our user is stored as hash where key is userId (user#{userId}, and in redis hash, we can't do search by hash values)
 export const getUserByUsername = async (username: string) => {
+	// We are using the sorted set. It will have (member:username, score:userId). 
 	const decimalUserId = await client.zScore(usernamesKey(), username);
 	if (decimalUserId === null) {
 		throw new Error('User not found');
 	}
 	const userId = decimalUserId.toString(16);
+
+	// We could have called getUserById(userId) too.
 	const user = await client.hGetAll(usersKey(userId));
 
 	return userDeserializer(userId, user);
