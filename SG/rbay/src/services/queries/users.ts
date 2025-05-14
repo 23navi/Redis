@@ -31,8 +31,11 @@ export const createUser = async (attrs: CreateUserAttrs) => {
 	}
 
 	const userId = genId();
+
+	// This is simply saving the user in db, if we are using a mix of redis and postgres, this can be an user table.
 	await client.hSet(usersKey(userId), userSerializer(attrs));
-	// Add username to set
+
+	// Add username to set (This is to check if user name already exist on new signup)
 	await client.sAdd(usernamesSetUniqueKey(), attrs.username);
 
 	await client.zAdd(usernamesKey(), {
