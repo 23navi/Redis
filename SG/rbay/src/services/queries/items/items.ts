@@ -15,6 +15,8 @@ export const getItem = async (id: string) => {
 	return deserialize(id, item);
 };
 
+
+// Here we are using the concept of pipeing to execute multiple redis operations in parallel.
 export const getItems = async (ids: string[]) => {
 	const getCommands = ids.map((id) => {
 		return client.hGetAll(itemsKey(id));
