@@ -43,3 +43,9 @@ export const itemsByViewsKey = () => {
 export const itemsByEndingAtKey = () => {
 	return 'items:endingat';
 };
+
+
+//HLL
+export const itemsViewsKey = (itemId: string) => {
+	return `items:views#${itemId}`;
+};
