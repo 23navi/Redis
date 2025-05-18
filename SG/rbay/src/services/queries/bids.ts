@@ -6,34 +6,69 @@ import { getItem } from './items';
 
 export const createBid = async (attrs: CreateBidAttrs) => {
 
-	// Bid creation validation checks
-	const item = await getItem(attrs.itemId)
+	return client.executeIsolated(async (isolatedClient) => {
+		const item = await getItem(attrs.itemId)
 
-	if (!item) {
-		throw new Error("Item not found")
-	}
+		if (!item) {
+			throw new Error("Item not found")
+		}
 
-	// So here we are comparing the attrs' createdAt time, but there can be a delay when user created the bid and now, it's upto us which logic to use.
-	if (attrs.createdAt > item.endingAt) {
-		throw new Error("Bidding window is closed")
-	}
-	if (attrs.amount <= item.price) {
-		throw new Error("Bid amount must be greater than the current price")
-	}
+		// So here we are comparing the attrs' createdAt time, but there can be a delay when user created the bid and now, it's upto us which logic to use.
+		if (attrs.createdAt > item.endingAt) {
+			throw new Error("Bidding window is closed")
+		}
+		if (attrs.amount <= item.price) {
+			throw new Error("Bid amount must be greater than the current price")
+		}
 
 
-	// atters.createdAt is an instance of luxon datetime, that's why we have .toMillis() on it
-	const serializedBid = serializeHistory(attrs.amount, attrs.createdAt.toMillis())
+		// atters.createdAt is an instance of luxon datetime, that's why we have .toMillis() on it
+		const serializedBid = serializeHistory(attrs.amount, attrs.createdAt.toMillis())
 
-	await Promise.all([
-		// Adding the bid to the right of the list, new bids goes to the right
-		client.rPush(bidHistoryKey(attrs.itemId), serializedBid),
-		client.hSet(itemsKey(attrs.itemId), {
-			price: attrs.amount,
-			highestBidUserId: attrs.userId,
-			bids: item.bids + 1
-		})
-	]);
+		const result = await isolatedClient
+			.multi()
+			.rPush(bidHistoryKey(attrs.itemId), serializedBid)
+			.hSet(itemsKey(attrs.itemId), {
+				price: attrs.amount,
+				highestBidUserId: attrs.userId,
+				bids: item.bids + 1
+			}).exec()
+
+		console.log({ result })
+		return result
+	})
+
+	// // Bid creation validation checks
+	// const item = await getItem(attrs.itemId)
+
+	// if (!item) {
+	// 	throw new Error("Item not found")
+	// }
+
+	// // So here we are comparing the attrs' createdAt time, but there can be a delay when user created the bid and now, it's upto us which logic to use.
+	// if (attrs.createdAt > item.endingAt) {
+	// 	throw new Error("Bidding window is closed")
+	// }
+	// if (attrs.amount <= item.price) {
+	// 	throw new Error("Bid amount must be greater than the current price")
+	// }
+
+
+	// // atters.createdAt is an instance of luxon datetime, that's why we have .toMillis() on it
+	// const serializedBid = serializeHistory(attrs.amount, attrs.createdAt.toMillis())
+
+	// const result = await Promise.all([
+	// 	// Adding the bid to the right of the list, new bids goes to the right
+	// 	client.rPush(bidHistoryKey(attrs.itemId), serializedBid),
+	// 	client.hSet(itemsKey(attrs.itemId), {
+	// 		price: attrs.amount,
+	// 		highestBidUserId: attrs.userId,
+	// 		bids: item.bids + 1
+	// 	})
+	// ]);
+
+	// console.log({ result })
+	// return result
 
 };
 
