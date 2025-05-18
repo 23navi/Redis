@@ -2,8 +2,29 @@ import type { CreateBidAttrs, Bid } from '$services/types';
 import { client } from '$services/redis';
 import { DateTime } from 'luxon';
 import { bidHistoryKey } from '$services/keys';
+import { getItem } from './items';
 
 export const createBid = async (attrs: CreateBidAttrs) => {
+
+	// Bid creation validation checks
+	const item = await getItem(attrs.itemId)
+
+	if (!item) {
+		throw new Error("Item not found")
+	}
+
+	// So here we are comparing the attrs' createdAt time, but there can be a delay when user created the bid and now, it's upto us which logic to use.
+	if (attrs.createdAt > item.endingAt) {
+		throw new Error("Bidding window is closed")
+	}
+	if (attrs.amount <= item.price) {
+		throw new Error("Bid amount must be greater than the current price")
+	}
+
+
+
+
+
 	// atters.createdAt is an instance of luxon datetime, that's why we have .toMillis() on it
 	const serializedBid = serializeHistory(attrs.amount, attrs.createdAt.toMillis())
 
