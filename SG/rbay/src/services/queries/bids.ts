@@ -1,7 +1,7 @@
 import type { CreateBidAttrs, Bid } from '$services/types';
 import { client } from '$services/redis';
 import { DateTime } from 'luxon';
-import { bidHistoryKey, itemsKey } from '$services/keys';
+import { bidHistoryKey, itemsByPriceKey, itemsKey } from '$services/keys';
 import { getItem } from './items';
 
 export const createBid = async (attrs: CreateBidAttrs) => {
@@ -32,7 +32,12 @@ export const createBid = async (attrs: CreateBidAttrs) => {
 				price: attrs.amount,
 				highestBidUserId: attrs.userId,
 				bids: item.bids + 1
-			}).exec()
+			})
+			.zAdd(itemsByPriceKey(), {
+				value: attrs.itemId,
+				score: attrs.amount
+			}, { XX: true }) // Only update the score if item exist, don't create new member if member DNE
+			.exec()
 
 		console.log({ result })
 		return result
