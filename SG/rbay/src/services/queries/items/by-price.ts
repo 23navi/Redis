@@ -14,7 +14,6 @@ export const itemsByPrice = async (order: 'DESC' | 'ASC' = 'DESC', offset = 0, c
         }
     })
 
-
     const items = []
     // For some reason, result is number | string[]
     if (Array.isArray(results)) {
