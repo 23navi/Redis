@@ -55,3 +55,9 @@ export const itemsViewsKey = (itemId: string) => {
 export const bidHistoryKey = (itemId: string) => {
 	return `history#${itemId}`
 }
+
+
+// Sorted set
+export const itemsByPriceKey = () => {
+	return 'items:price';
+}
