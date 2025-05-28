@@ -19,7 +19,11 @@ export const withLock = async (key: string, cb: () => any) => {
 	while (retries >= 0) {
 		retries--;
 		// Try to acquire the lock
-		const locked = await client.setNX(lockKey, randomValue);
+		// const locked = await client.setNX(lockKey, randomValue);
+		const locked = await client.set(lockKey, randomValue, {
+			NX: true,
+			PX: 20000 // 2 sec
+		});
 
 		// If we failed to acquire the lock, we will retry after a delay
 		if (!locked) {
@@ -32,7 +36,7 @@ export const withLock = async (key: string, cb: () => any) => {
 			const result = await cb();
 			return result;
 		} finally {
-			// Release the lock
+			// Release the lock (by deleting the lock key)
 			await client.del(lockKey);
 		}
 	}
