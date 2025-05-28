@@ -37,7 +37,7 @@ export const withLock = async (key: string, cb: () => any) => {
 			return result;
 		} finally {
 			// Release the lock (by deleting the lock key)
-			await client.del(lockKey);
+			await client.unlock(lockKey, randomValue);
 		}
 	}
 };
