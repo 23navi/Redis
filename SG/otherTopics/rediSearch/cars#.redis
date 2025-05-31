@@ -73,4 +73,21 @@ will give
 ]
 
 
+| Field Type | Use Case            | Matching Style                | Example Query                        |
+| ---------- | ------------------- | ----------------------------- | ------------------------------------ |
+| `TEXT`     | Free text           | Full-text search, tokenized   | `@name:honda` (matches "honda jazz") |
+| `NUMERIC`  | Numbers             | Range queries                 | `@year:[2015 2020]`                  |
+| `TAG`      | Categories / labels | Exact match (no tokenization) | `@color:{red}`                       |
 
+
+
+
+Searching with tag 
+
+FT.SEARCH idx:cars '@color:{blue}'
+
+
+
+Searching with numeric Range
+
+FT.SEARCH idx:cars '@year: [2017 2020]'
