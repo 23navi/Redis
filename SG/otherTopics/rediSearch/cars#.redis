@@ -1,0 +1,76 @@
+## Creating dummy hash entry
+
+HSET cars#1 name "honda jazz" year 2015 color red
+HSET cars#2 name "Hundia i20" year 2020 color blue
+HSET cars#3 name "Lamborgarni x" year 2022 color green
+HSET cars#4 name "Tesla S" year 2019 color red
+
+
+FT.CREATE idx.cars ON HASH PREFIX 1 cars# 
+    SCHEMA name TEXT year NUMERIC  color TAG
+
+
+## what is PREFIX 1 cars# 
+
+So similar to how we pass keys count while creating lua script (key 1 tells that 1 key will be given)
+Here we say that create index on 1 prefix which is cars#
+
+We can also have PREFIX 3 cars# truck# plane# (but we will have to make sure that they have same named feilds)
+
+
+
+Note: We have different types of datatype for the feilds (TEXT, NUMERIC, TAG ....)
+
+
+
+
+FT.SEARCH idx.cars '@name:(honda)' 
+
+response: 
+[
+  1,
+  "cars#1",
+  [
+    "name",
+    "honda jazz",
+    "year",
+    "2015",
+    "color",
+    "red"
+  ]
+]
+
+Note: We searched for "honda" and it gave "honda jazz", so it is like a match kind of search.
+
+Say we add one more 
+
+HSET cars#5 name "honda city" year 2019 color white
+
+Now: FT.SEARCH idx.cars '@name:(honda)' 
+
+will give
+
+[
+  2,
+  "cars#5",
+  [
+    "name",
+    "honda city",
+    "year",
+    "2019",
+    "color",
+    "white"
+  ],
+  "cars#1",
+  [
+    "name",
+    "honda jazz",
+    "year",
+    "2015",
+    "color",
+    "red"
+  ]
+]
+
+
+
