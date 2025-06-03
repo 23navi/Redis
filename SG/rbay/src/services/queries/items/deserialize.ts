@@ -1,6 +1,8 @@
 import type { Item } from '$services/types';
 import { DateTime } from 'luxon';
 
+
+// Deserialize the individual item hash to js object
 export const deserialize = (id: string, item: { [key: string]: string }): Item => {
 	return {
 		id,
