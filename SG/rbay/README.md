@@ -38,3 +38,25 @@ npm run build
 You can preview the production build with `npm run preview`.
 
 > To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+
+
+
+## Starting the redis server locally
+
+```bash
+redis-stack-server
+```
+
+We have already installed the redis stack server locally on our mac (linux)
+
+```bash
+brew tap redis-stack/redis-stack
+brew install redis-stack
+```
+
+
+To connect to the redis stack we are running, we can use
+
+```bash
+redis-cli
+```
