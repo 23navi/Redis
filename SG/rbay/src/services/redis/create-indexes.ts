@@ -13,8 +13,8 @@ export const createIndexes = async () => {
             console.log('Index already exists, skipping creation');
             return;
         }
-        console.log('Creating index');
 
+        console.log('Creating index for ', itemsIndexKey());
 
         // Note: This client.ft.create() will create the function.  (it is an async function )
         return client.ft.create(itemsIndexKey(), {
