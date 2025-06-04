@@ -2,11 +2,10 @@ import { client } from "$services/redis";
 import { deserialize } from "./deserialize"; // Deserialize the individual item hash to js object
 import { itemsIndexKey } from "$services/keys";
 
-
 // This function will be called everytime user added any character in the search feild, think that input feild as controled component in react and for each keystroke, we are calling this function and updating the state of suggesition. (There is 500ms debounce too)
 // size is the number of search results to return, default to 5, we can send less if we don't have 5 matching results. 5 is the upper cap
 export const searchItems = async (term: string, size: number = 5) => {
-    console.log("This is called with: ", term)
+    // console.log("This is called with: ", term)
 
     // Say we get the input from client as "nabi  sure ", now we have to make this input as a form that redisearch expects, we want something like (%nabi% %sure%) {and operation}
     const cleanedInputTerm = term
@@ -17,20 +16,27 @@ export const searchItems = async (term: string, size: number = 5) => {
         .map((word) => word ? `%${word}%` : "") // Add %% around words
         .join(" "); // finally convert string[] to string
 
-
+    console.log({ cleanedInputTerm })
 
     // Look at the cleanedInputTerm and make sure that we don't get empty string or 1 character. We should start giving out results for 2 or more characters
     if (cleanedInputTerm.length < 2) {
         return [];
     }
 
+
+    const searchQuery = `(@name:(${cleanedInputTerm}) => {$weight:5.0}) | (@description:(${cleanedInputTerm}))`
+
     // Use the client to do the actual search
-    const results = await client.ft.search(itemsIndexKey(), cleanedInputTerm, {
-        LIMIT: {
-            from: 0,
-            size
-        }
-    });
+    const results = await client.ft.search(
+        itemsIndexKey(),
+        // cleanedInputTerm,
+        searchQuery,
+        {
+            LIMIT: {
+                from: 0,
+                size
+            }
+        });
 
     // Results will look something like   { console.log(results) }
     // {
@@ -43,6 +49,8 @@ export const searchItems = async (term: string, size: number = 5) => {
     //             { id: 'items#b3485f', value: [Object: null prototype] }
     //         ]
     // }
+
+    console.log(results.documents[0]?.value)
 
     // So have to loop through the results and deserialize the individual item hash to js object
     return results.documents.map(({ id, value }) => deserialize(id, value as any));
