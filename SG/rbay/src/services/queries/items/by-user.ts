@@ -23,7 +23,7 @@ export const itemsByUser = async (userId: string, opts: QueryOpts) => {
 		DIRECTION: opts.direction
 	}
 
-	const { total, documents } = await client.ft.search("idx:items", query, {
+	const { total, documents } = await client.ft.search(itemsIndexKey(), query, {
 		ON: "HASH",
 		SORTBY: sortCriteria,
 		LIMIT: {
@@ -34,8 +34,10 @@ export const itemsByUser = async (userId: string, opts: QueryOpts) => {
 
 
 	return {
-		totalPages: 0,
-		items: []
+		totalPages: Math.ceil(total / opts.perPage),
+		items: documents.map(({ id, value }) => {
+			return deserialize(id.replace("items#", ""), value as any)
+		})
 	}
 };
 
