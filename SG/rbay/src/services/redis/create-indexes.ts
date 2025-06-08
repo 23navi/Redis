@@ -20,11 +20,34 @@ export const createIndexes = async () => {
         return client.ft.create(itemsIndexKey(), {
             name: {
                 type: SchemaFieldTypes.TEXT,
+                SORTABLE: true
             },
             description: {
                 type: SchemaFieldTypes.TEXT,
+                SORTABLE: false
+            },
+            orderId: {
+                type: SchemaFieldTypes.TAG,
+                SORTABLE: true
+            },
+            endingAt: {
+                type: SchemaFieldTypes.NUMERIC,
+                SORTABLE: true
+            },
+            views: {
+                type: SchemaFieldTypes.NUMERIC,
+                SORTABLE: true
+            },
+            likes: {
+                type: SchemaFieldTypes.NUMERIC,
+                SORTABLE: true
+            },
+            price: {
+                type: SchemaFieldTypes.NUMERIC,
+                SORTABLE: true
             }
-        },
+            // for some reason this version of node redis is giving ts error, so marking it as any.
+        } as any,
             {
                 ON: 'HASH',
                 PREFIX: itemsKey("")
